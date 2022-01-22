@@ -1,0 +1,108 @@
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from time import sleep, strftime
+from random import randint
+import pandas as pd
+import time
+
+
+PATH = "/Users/luyifan/Desktop/driver/chromedriver"
+driver = webdriver.Chrome(PATH)
+
+class instabot:
+    def __init__(self, username, password,hashtag):
+        self.username = username 
+        self.password = password 
+        self.hashtag = hashtag 
+        self.users = []
+        # initialize insta url 
+        self.insta_url = 'https://www.instagram.com/'
+        # calls driver to open chrome web browser 
+        self.bot = driver 
+        
+    # login function 
+    def login(self):
+        self.bot.get(self.insta_url)
+        # enter username 
+        username = WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.NAME,"username")))
+        username.clear()
+        username.send_keys(self.username)
+        password = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.NAME,"password")))
+        password.clear()
+        password.send_keys(self.password)
+
+        time.sleep(2)
+        
+        # press the login button 
+        # login = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "button[type="submit"]"))).click()
+
+        login = driver.find_element_by_xpath('//*[@id="loginForm"]/div/div[3]/button')
+        login.click()
+        time.sleep(5)
+
+        # first pop-up
+        now = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH,"//button[contains(text(),'Not now')]"))).click()
+        now1 = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH,"//button[contains(text(),'Not Now')]"))).click()
+        def search_hashtags(self):        
+        # get the search button 
+        search = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//input[@placeholder = 'Search']")))
+        search.clear()
+        keyword = '#' + self.hashtag
+        search.send_keys(keyword)
+        time.sleep(5)
+        search.send_keys(Keys.ENTER)
+        time.sleep(5)
+        search.send_keys(Keys.ENTER)
+    
+    #basic algorithm to get engagement(Search by hashtag, then like and follow)
+    def basic_like_and_follow_hashtags(self):
+        for i in range(10):
+            if i == 0:
+                firstpost = driver.find_element_by_xpath('//*[@id="react-root"]/section/main/article/div[2]/div/div[1]/div[1]')
+                firstpost.click()
+            #first i want to like add name and then follow
+            sleep(2)
+            likebutton= driver.find_element_by_xpath('/html/body/div[6]/div[3]/div/article/div/div[2]/div/div/div[2]/section[1]/span[1]/button')
+            likebutton.click()
+            sleep(2)
+            followbutton = driver.find_element_by_xpath('/html/body/div[6]/div[3]/div/article/div/div[2]/div/div/div[1]/div/header/div[2]/div[1]/div[2]/button')
+            if followbutton.text == 'Follow':
+                followbutton.click()
+            else:
+                pass
+            name = driver.find_element_by_xpath('/html/body/div[6]/div[3]/div/article/div/div[2]/div/div/div[1]/div/header/div[2]/div[1]/div[1]/span/a')                
+            self.users.append(name.text)
+            sleep(2)
+            nxt = driver.find_element_by_xpath('/html/body/div[6]/div[2]/div/div[2]/button')
+            nxt.click()
+            
+ 
+        
+    #using data of users from hashtag, we spam like all their photos individualy
+    def advanced_like(self):
+        for i in self.users:
+            driver.get('https://www.instagram.com/' + i + '/')
+            time.sleep(2)
+            number = driver.find_element_by_xpath('//*[@id="react-root"]/section/main/div/header/section/ul/li[1]/span/span')
+            
+            if int(number.text) < 6 : 
+                pass
+            else:
+                firstpost = driver.find_element_by_xpath('//*[@id="react-root"]/section/main/div/div[3]/article/div[1]/div/div[1]/div[1]')
+                firstpost.click() 
+                sleep(2)
+                for i in range(6):
+                    if i == 0:
+                        likebutton = driver.find_element_by_xpath('/html/body/div[6]/div[3]/div/article/div/div[2]/div/div/div[2]/section[1]/span[1]')
+                        likebutton.click()   
+                    else:
+                        nextbutton = driver.find_element_by_xpath('/html/body/div[6]/div[2]/div/div/button')
+                        nextbutton.click()
+                        sleep(2)
+                        likebutton = driver.find_element_by_xpath('//html/body/div[6]/div[3]/div/article/div/div[2]/div/div/div[2]/section[1]/span[1]')
+                        likebutton.click()
+
+
